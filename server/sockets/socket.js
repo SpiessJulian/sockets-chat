@@ -21,20 +21,27 @@ io.on('connection', (client) => {
         users.addPerson(client.id, data.name, data.room);
 
         client.broadcast.to(data.room).emit('peopleList', users.getPeopleInRoom(data.room));
+        client.broadcast.to(data.room).emit('makeMessage', makeMessage('Admin', `${data.name} join the chat`));
         callback(users.getPeopleInRoom(data.room));
     });
 
-    client.on('makeMessage', (data) => {
+    client.on('makeMessage', (data, callback) => {
         let person = users.getPerson(client.id);
+
+        if(!data.message){
+            return;
+        }
 
         let message = makeMessage(person.name, data.message);
         client.broadcast.to(person.room).emit('makeMessage', message);
+        
+        callback(message);
     });
 
     client.on('disconnect', () => {
         let personDeleted = users.deletePerson(client.id);
 
-        client.broadcast.to(personDeleted.room).emit('peopleList', users.getPeopleInRoom());
+        client.broadcast.to(personDeleted.room).emit('peopleList', users.getPeopleInRoom(personDeleted.room));
         client.broadcast.to(personDeleted.room).emit('makeMessage', makeMessage('Admin', `${personDeleted.name} left the chat`));
     });
 

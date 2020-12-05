@@ -20,7 +20,7 @@ socket.on('connect', function() {
     console.log('Connected to Server');
 
     socket.emit('enterChat', user, function(resp) {
-        console.log('Users Connected: ', resp);
+        renderUsers(resp);
     });
 });
 
@@ -30,21 +30,17 @@ socket.on('disconnect', function() {
 });
 
 
-// Send info
-/* socket.emit('makeMessage', {
-    message: 'Hola Mundo'
-}, function(resp) {
-    console.log('Server Response: ', resp);
-}); */
+
 
 // recive msgs
 socket.on('makeMessage', function(message) {
-    console.log('Server:', message);
+    renderMessages(message, false);
+    scrollBottom();
 });
 
 //List of users update
 socket.on('peopleList', function(people) {
-    console.log(people);
+    renderUsers(people);
 });
 
 
